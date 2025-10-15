@@ -9,8 +9,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 @Entity
-@Table(name = "TB_PRODUCT")
-public class ProductEntry {
+@Table(name = "tb_product")
+public class ProductEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,20 +19,16 @@ public class ProductEntry {
     private String description;
     private String brand;
     private String model;
-    private Double price;
-
+    private double price;
     @Column(length = 3)
     private String currency;
-
     private Integer stock;
 
     @Transient
-    private String environment;
-
+    private String enviroment;
     @Transient
-    private Double convertedPrice;
+    private double convertedPrice;
 
-    // Getters e Setters (Essenciais para o Spring JPA/REST)
     public Long getId() {
         return id;
     }
@@ -57,10 +53,10 @@ public class ProductEntry {
     public void setModel(String model) {
         this.model = model;
     }
-    public Double getPrice() {
+    public double getPrice() {
         return price;
     }
-    public void setPrice(Double price) {
+    public void setPrice(double price) {
         this.price = price;
     }
     public String getCurrency() {
@@ -75,16 +71,20 @@ public class ProductEntry {
     public void setStock(Integer stock) {
         this.stock = stock;
     }
-    public String getEnvironment() {
-        return environment;
+    public String getEnviroment() {
+        return enviroment;
     }
-    public void setEnvironment(String environment) {
-        this.environment = environment;
+    public void setEnviroment(String enviroment) {
+        this.enviroment = enviroment;
     }
-    public Double getConvertedPrice() {
+    public double getConvertedPrice() {
         return convertedPrice;
     }
-    public void setConvertedPrice(Double convertedPrice) {
+    public void setConvertedPrice(double convertedPrice) {
         this.convertedPrice = convertedPrice;
     }
+
+
+
+
 }
