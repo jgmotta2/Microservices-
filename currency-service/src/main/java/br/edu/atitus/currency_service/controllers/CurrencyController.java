@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 import br.edu.atitus.currency_service.entities.CurrencyEntity;
 import br.edu.atitus.currency_service.repositories.CurrencyRepository;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 @RestController
 @RequestMapping("currency")
 public class CurrencyController {
@@ -50,17 +54,28 @@ public class CurrencyController {
 			currency.setConversionRate(1);
 		}
 		else {
+			LocalDate lastBusinessDay = LocalDate.now();
+
+			if (lastBusinessDay.getDayOfWeek() == DayOfWeek.SATURDAY) {
+				lastBusinessDay = lastBusinessDay.minusDays(1);
+			} else if (lastBusinessDay.getDayOfWeek() == DayOfWeek.SUNDAY) {
+				lastBusinessDay = lastBusinessDay.minusDays(2);
+			}
+
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+			String quoteDate = lastBusinessDay.format(formatter);
+
 			double currencySource = 1;
 			double currencyTarget = 1;
 
 			if(!source.equals("BRL")){
-				CurrencyBcResponse response = currencyBcClient.getCurrency(source);
-				if(response.getValue().isEmpty()) throw new Exception("Currency not found" + source);
+				CurrencyBcResponse response = currencyBcClient.getCurrency(source, quoteDate);
+				if(response.getValue().isEmpty()) throw new Exception("Currency not found " + source + " for date " + quoteDate);
 				currencySource = response.getValue().get(0).getCotacaoVenda();
 			}
 			if(!target.equals("BRL")){
-				CurrencyBcResponse response = currencyBcClient.getCurrency(target);
-				if(response.getValue().isEmpty()) throw new Exception("Currency not found" + target);
+				CurrencyBcResponse response = currencyBcClient.getCurrency(target, quoteDate);
+				if(response.getValue().isEmpty()) throw new Exception("Currency not found " + target + " for date " + quoteDate);
 				currencyTarget = response.getValue().get(0).getCotacaoVenda();
 			}
 			currency.setConversionRate(currencySource / currencyTarget);
@@ -70,12 +85,6 @@ public class CurrencyController {
 		currency.setConvertedValue(value * currency.getConversionRate());
 		currency.setEnviroment("Currency running in port: " + serverPort + "- DataSource: " + dataSource);
 
-
 		return ResponseEntity.ok(currency);
-
 	}
-
-
-
-
 }
