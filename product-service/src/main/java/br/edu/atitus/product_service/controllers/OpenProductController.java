@@ -1,6 +1,7 @@
 package br.edu.atitus.product_service.controllers;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,6 +30,7 @@ public class OpenProductController {
     private int serverPort;
 
     @GetMapping("/{idProduct}/{targetCurrency}")
+    @Cacheable(value = "productConversion", key = "#idProduct + '-' + #targetCurrency")
     public ResponseEntity<ProductEntity> getProduct(
             @PathVariable Long idProduct,
             @PathVariable String targetCurrency
@@ -46,12 +48,16 @@ public class OpenProductController {
                     product.getPrice(),
                     product.getCurrency(),
                     targetCurrency);
-            product.setConvertedPrice(currency.getConvertedValue());
-            product.setEnviroment(product.getEnviroment() +
-                    " - " + currency.getEnviroment());
+            if(currency != null){
+                product.setConvertedPrice(currency.getConvertedValue());
+                product.setEnviroment(product.getEnviroment() +
+                        " - " + currency.getEnviroment());
+            }
+            else {
+                product.setConvertedPrice(-1);
+                product.setEnviroment(product.getEnviroment() + " - Currency unavailable");
+            }
         }
-
         return ResponseEntity.ok(product);
     }
-
 }
