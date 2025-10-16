@@ -5,6 +5,7 @@ import java.util.List;
 public class CurrencyBcResponse {
 
     private List<CurrencyBC> value;
+    private String dataSource = "API BCB";
 
     public static class CurrencyBC{
         private double cotacaoVenda;
@@ -24,5 +25,13 @@ public class CurrencyBcResponse {
 
     public void setValue(List<CurrencyBC> value) {
         this.value = value;
+    }
+
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
     }
 }
